@@ -15,10 +15,15 @@ This document assumes that the OpenSSH-ca environment has already been commissio
 A new client does not have any software or configuration specific to OpenSSH-ca.  The client will only have the OpenSSH software, plus its recently-generated (and currently untrusted) host keys.  The bootstrap process involves six steps:
 
 1. (*Optional*) Download and install an OpenSSH-ca enrollment client.
+
 1. Download the bootstrap configuration file and public key.
+
 1. Download and install the OpenSSH-ca KRL update agent.
+
 1. Create and submit an enrollment request.
+
 1. Wait for signatures to be issued.
+
 1. Download and install the public keys.
 
 Client Bootstrap
@@ -27,12 +32,19 @@ Client Bootstrap
 The process begins by downloading the bootstrap key and configuration file onto the client.  The bootstrap configuration file contains pointers to the other configuration files, as well as the keys used to sign those files.  The bootstrap configuration file includes the following information:
 
 A. The name of the OpenSSH-ca environment.
+
 A. The URL where the OpenSSH-ca's known_hosts file will be found.
+
 A. The public key used to sign the known_hosts file.
+
 A. The URL where the OpenSSH-ca enrollment client can find the list of enrollment servers.
+
 A. The public key used to sign the list of enrollment servers.
+
 A. The URL where the OpenSSH-ca's KRL update agent can find its configuration file.
+
 A. The public key used to sign the KRL update agent's configuration file.
+
 A. The public key used to sign enrollment server configuration files.
 
 The bootstrap public key is used to sign the bootstrap configuration file.  The bootstrap public key is one of the two most critical pieces of OpenSSH-ca (the other is the OpenSSH public keys), because all of the OpenSSH-ca agents rely on the bootstrap configuration file in order to work.
@@ -47,8 +59,11 @@ Once the bootstrap configuration file and key are installed, the OpenSSH-ca KRL 
 The bootstrap configuration file contains a URL to the KRL agent's configuration file, which contains all of the information necessary for the agent to work.  This includes the following:
 
 A. The URL to download the KRL.
+
 A. The public key used to sign the KRL.
+
 A. A known-good public key, for KRL testing.
+
 A. A known-revoked public key, for KRL testing.
 
 The bootstrap configuration file contains the public key used to verify the KRL agent's configuration file.
@@ -61,8 +76,11 @@ Client Enrollment Request
 Once the bootstrap is complete and the KRL is being kept up-to-date, the client may now submit its enrollment request.  The new request starts out with the following fields:
 
 I. The system's hostname and (if different) fully-qualified domain name.
+
 I. The system's OpenSSH public keys.
+
 I. A randomly-generated nonce.
+
 I. Date and time the request was generated.
 
 At this point, the request does not contain any authenticating information, because there are multiple ways for authenticating a request, and each environment will make their own choice as to how to authenticate.
@@ -77,6 +95,7 @@ The enrollment agent has the task of authenticating the host, adding additional 
 The OpenSSH-ca environment includes a enrollment server configuration file, which includes
 
 A. The Amazon SNS endpoint URL to use.
+
 A. The SNS ARN where requests should be sent.
 
 The enrollment server configuration file is signed using the public key provided in the bootstrap configuration file.
@@ -86,8 +105,11 @@ Each enrollment server also has their own key pair and
 Once the enrollment server has authenticated the requestor, and verified that the request is authorized, the following information is added to the request:
 
 I. The ID of the enrollment server that received the request.
+
 I. The method used to authenticate the client.
+
 I. The unique ID of the client (which will vary depending on the authentication method used).
+
 I. Date and time the request was authenticated.
 
 For example, if the authentication method was GSSAPI over SSH, using the client's host principal, the authentication method will be `GSSAPI+http` and the unique ID will be `host/system_fqdn@realm_name`.
